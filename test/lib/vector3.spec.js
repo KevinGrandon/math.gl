@@ -91,7 +91,8 @@ test('Vector3#scale', t => {
     {input: [1, 2, 3], scale: [2, 0, -1], result: [2, 0, -3]}
   ];
   for (const tc of TEST_CASES) {
-    const result = new Vector3(...tc.input).scale(tc.scale);
+    const v = new Vector3(...tc.input);
+    const result = v.scale(tc.scale);
     tapeEquals(t, result, tc.result);
   }
   t.end();

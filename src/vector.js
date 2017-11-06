@@ -58,4 +58,67 @@ export default class Vector extends MathArray {
     }
     return this.check();
   }
+
+  // OPERATIONS
+
+  add(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] += vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  subtract(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] -= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  multiply(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] *= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  divide(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] /= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  // A single number is multiplied with all element, an array calls this.multiply
+  scale(scale) {
+    if (Number.isFinite(scale)) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] *= scale;
+      }
+      return this.check();
+    }
+    return this.multiply(scale);
+  }
+
+  scaleAndAdd(vector, scale) {
+    checkNumber(scale);
+    for (let i = 0; i < this.ELEMENTS; ++i) {
+      this[i] += vector[i] * scale;
+    }
+    return this.check();
+  }
+
+  // Apply general gl-matrix operation with `this` as first two args
+  operation(operation, ...args) {
+    operation(this, this, ...args);
+    return this.check();
+  }
 }

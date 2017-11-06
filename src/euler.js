@@ -32,34 +32,30 @@ function validateOrder(value) {
   return (value >= 0 && value < 6);
 }
 
-function checkOrder(value) {
-  if (value < 0 && value >= 6) {
-    throw new Error(ERR_UNKNOWN_ORDER);
-  }
-  return value;
-}
+// function checkOrder(value) {
+//   if (value < 0 && value >= 6) {
+//     throw new Error(ERR_UNKNOWN_ORDER);
+//   }
+//   return value;
+// }
+
+export const EULER_ORDER = {
+  XYZ: 0,
+  YZX: 1,
+  ZXY: 2,
+  XZY: 3,
+  YXZ: 4,
+  ZYX: 5,
+  RollPitchYaw: 0,
+  DefaultOrder: 0
+};
 
 export default class Euler extends MathArray {
-
-  // static XYZ = 0;
-  // static YZX = 1;
-  // static ZXY = 2;
-  // static XZY = 3;
-  // static YXZ = 4;
-  // static ZYX = 5;
-  // static RollPitchYaw = 0;
-  // static DefaultOrder = 0;
 
   // Constants
   /* eslint-disable no-multi-spaces, brace-style, no-return-assign */
   static get ZYX() { return 0; }
-  static get YXZ() { return 1; }
-  static get XZY() { return 2; }
-  static get ZXY() { return 3; }
-  static get YZX() { return 4; }
-  static get XYZ() { return 5; }
   static get RollPitchYaw() { return 0; }
-
   static get DefaultOrder() { return Euler.ZYX; }
   static get RotationOrders() {
     return ['ZYX', 'YXZ', 'XZY', 'ZXY', 'YZX', 'XYZ'];
@@ -67,6 +63,23 @@ export default class Euler extends MathArray {
   static rotationOrder(order) { return Euler.RotationOrders[order]; }
 
   get ELEMENTS() { return 4; }
+
+  /* eslint-disable no-multi-spaces, brace-style, no-return-assign */
+  // phi, theta, psi angle notation
+  get phi()        { return this[0]; }
+  set phi(value)   { return this[0] = checkNumber(value); }
+  get theta()      { return this[1]; }
+  set theta(value) { return this[1] = checkNumber(value); }
+  get psi()        { return this[2]; }
+  set psi(value)   { return this[2] = checkNumber(value); }
+
+  // roll, pitch, yaw angle notation
+  get roll()       { return this[0]; }
+  set roll(value)  { return this[0] = checkNumber(value); }
+  get pitch()      { return this[1]; }
+  set pitch(value) { return this[1] = checkNumber(value); }
+  get yaw()        { return this[2]; }
+  set yaw(value)   { return this[2] = checkNumber(value); }
   /* eslint-enable no-multi-spaces, brace-style, no-return-assign */
 
   /*
@@ -87,8 +100,7 @@ export default class Euler extends MathArray {
       this[i] = array[i];
     }
     this[3] = Number.isFinite(array[3]) || this.order;
-    this.check();
-    return this;
+    return this.check();
   }
 
   // Sets the three angles, and optionally sets the rotation order
@@ -98,8 +110,7 @@ export default class Euler extends MathArray {
     this[1] = y;
     this[2] = z;
     this[3] = Number.isFinite(order) ? order : this[3];
-    this.check();
-    return this;
+    return this.check();
   }
 
   validate() {
@@ -133,44 +144,6 @@ export default class Euler extends MathArray {
     return new Vector3(this[0], this[1], this[2]);
   }
 
-  /* eslint-disable no-multi-spaces, brace-style, no-return-assign */
-  // x, y, z angle notation (note: only corresponds to axis in XYZ orientation)
-  get x()      { return this[0]; }
-  set x(value) { return this[0] = checkNumber(value); }
-  get y()      { return this[1]; }
-  set y(value) { return this[1] = checkNumber(value); }
-  get z()      { return this[2]; }
-  set z(value) { return this[2] = checkNumber(value); }
-
-  // alpha, beta, gamma angle notation
-  get alpha()      { return this[0]; }
-  set alpha(value) { return this[0] = checkNumber(value); }
-  get beta()       { return this[1]; }
-  set beta(value)  { return this[1] = checkNumber(value); }
-  get gamma()      { return this[2]; }
-  set gamma(value) { return this[2] = checkNumber(value); }
-
-  // phi, theta, psi angle notation
-  get phi()        { return this[0]; }
-  set phi(value)   { return this[0] = checkNumber(value); }
-  get theta()      { return this[1]; }
-  set theta(value) { return this[1] = checkNumber(value); }
-  get psi()        { return this[2]; }
-  set psi(value)   { return this[2] = checkNumber(value); }
-
-  // roll, pitch, yaw angle notation
-  get roll()       { return this[0]; }
-  set roll(value)  { return this[0] = checkNumber(value); }
-  get pitch()      { return this[1]; }
-  set pitch(value) { return this[1] = checkNumber(value); }
-  get yaw()        { return this[2]; }
-  set yaw(value)   { return this[2] = checkNumber(value); }
-
-  // rotation order, in all three angle notations
-  get order()      { return this[3]; }
-  set order(value) { return this[3] = checkOrder(value); }
-  /* eslint-disable no-multi-spaces, brace-style, no-return-assign */
-
   // Constructors
   fromVector3(v, order) {
     return this.set(v[0], v[1], v[2], Number.isFinite(order) ? order : this[3]);
@@ -184,8 +157,7 @@ export default class Euler extends MathArray {
     if (array[3] !== undefined) {
       this[3] = array[3];
     }
-    this.check();
-    return this;
+    return this.check();
   }
 
   // Common ZYX rotation order
@@ -195,14 +167,12 @@ export default class Euler extends MathArray {
 
   fromQuaternion(q, order) {
     this._fromRotationMatrix(Matrix4.fromQuaternion(q), order);
-    this.check();
-    return this;
+    return this.check();
   }
 
   fromRotationMatrix(m, order = Euler.DefaultOrder) {
     this._fromRotationMatrix(m, order);
-    this.check();
-    return this;
+    return this.check();
   }
 
   // ACCESSORS
@@ -214,21 +184,13 @@ export default class Euler extends MathArray {
     return m;
   }
 
-  getQuaternion() {
+  getQuaternion(order) {
     const q = new Quaternion();
-    switch (this[4]) {
-    case Euler.XYZ:
-      return q.rotateX(this[0]).rotateY(this[1]).rotateZ(this[2]);
-    case Euler.YXZ:
-      return q.rotateY(this[0]).rotateX(this[1]).rotateZ(this[2]);
+    switch (order || this[4]) {
     case Euler.ZXY:
       return q.rotateZ(this[0]).rotateX(this[1]).rotateY(this[2]);
     case Euler.ZYX:
       return q.rotateZ(this[0]).rotateY(this[1]).rotateX(this[2]);
-    case Euler.YZX:
-      return q.rotateY(this[0]).rotateZ(this[1]).rotateX(this[2]);
-    case Euler.XZY:
-      return q.rotateX(this[0]).rotateZ(this[1]).rotateY(this[2]);
     default:
       throw new Error(ERR_UNKNOWN_ORDER);
     }
@@ -250,8 +212,10 @@ export default class Euler extends MathArray {
 
     const te = m.elements;
     const m11 = te[0], m12 = te[4], m13 = te[8];
-    const m21 = te[1], m22 = te[5], m23 = te[9];
-    const m31 = te[2], m32 = te[6], m33 = te[10];
+    // const m21 = te[1];
+    // const m31 = te[2];
+    const m22 = te[5], m23 = te[9];
+    const m32 = te[6], m33 = te[10];
 
     order = order || this[3];
 
@@ -268,66 +232,6 @@ export default class Euler extends MathArray {
       }
       break;
 
-    case Euler.YXZ:
-      this[0] = Math.asin(-clamp(m23, -1, 1));
-
-      if (Math.abs(m23) < ALMOST_ONE) {
-        this[1] = Math.atan2(m13, m33);
-        this[2] = Math.atan2(m21, m22);
-      } else {
-        this[1] = Math.atan2(-m31, m11);
-        this[2] = 0;
-      }
-      break;
-
-    case Euler.ZXY:
-      this[0] = Math.asin(clamp(m32, -1, 1));
-
-      if (Math.abs(m32) < ALMOST_ONE) {
-        this[1] = Math.atan2(-m31, m33);
-        this[2] = Math.atan2(-m12, m22);
-      } else {
-        this[1] = 0;
-        this[2] = Math.atan2(m21, m11);
-      }
-      break;
-
-    case Euler.ZYX:
-      this[1] = Math.asin(-clamp(m31, -1, 1));
-
-      if (Math.abs(m31) < ALMOST_ONE) {
-        this[0] = Math.atan2(m32, m33);
-        this[2] = Math.atan2(m21, m11);
-      } else {
-        this[0] = 0;
-        this[2] = Math.atan2(-m12, m22);
-      }
-      break;
-
-    case Euler.YZX:
-      this[2] = Math.asin(clamp(m21, -1, 1));
-
-      if (Math.abs(m21) < ALMOST_ONE) {
-        this[0] = Math.atan2(-m23, m22);
-        this[1] = Math.atan2(-m31, m11);
-      } else {
-        this[0] = 0;
-        this[1] = Math.atan2(m13, m33);
-      }
-      break;
-
-    case Euler.XZY:
-      this[2] = Math.asin(-clamp(m12, -1, 1));
-
-      if (Math.abs(m12) < ALMOST_ONE) {
-        this[0] = Math.atan2(m32, m22);
-        this[1] = Math.atan2(m13, m11);
-      } else {
-        this[0] = Math.atan2(-m23, m33);
-        this[1] = 0;
-      }
-      break;
-
     default:
       throw new Error(ERR_UNKNOWN_ORDER);
     }
@@ -337,7 +241,7 @@ export default class Euler extends MathArray {
     return this;
   }
 
-  _getRotationMatrix() {
+  _getRotationMatrix(order) {
     const te = new Matrix4();
 
     const x = this.x, y = this.y, z = this.z;
@@ -348,41 +252,7 @@ export default class Euler extends MathArray {
     const d = Math.sin(y);
     const f = Math.sin(z);
 
-    switch (this[3]) {
-    case Euler.XYZ: {
-      const ae = a * e, af = a * f, be = b * e, bf = b * f;
-
-      te[0] = c * e;
-      te[4] = -c * f;
-      te[8] = d;
-
-      te[1] = af + be * d;
-      te[5] = ae - bf * d;
-      te[9] = -b * c;
-
-      te[2] = bf - ae * d;
-      te[6] = be + af * d;
-      te[10] = a * c;
-      break;
-    }
-
-    case Euler.YXZ: {
-      const ce = c * e, cf = c * f, de = d * e, df = d * f;
-
-      te[0] = ce + df * b;
-      te[4] = de * b - cf;
-      te[8] = a * d;
-
-      te[1] = a * f;
-      te[5] = a * e;
-      te[9] = -b;
-
-      te[2] = cf * b - de;
-      te[6] = df + ce * b;
-      te[10] = a * c;
-      break;
-    }
-
+    switch (order || this[3]) {
     case Euler.ZXY: {
       const ce = c * e, cf = c * f, de = d * e, df = d * f;
 
@@ -414,40 +284,6 @@ export default class Euler extends MathArray {
       te[2] = -d;
       te[6] = b * c;
       te[10] = a * c;
-      break;
-    }
-
-    case Euler.YZX: {
-      const ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-      te[0] = c * e;
-      te[4] = bd - ac * f;
-      te[8] = bc * f + ad;
-
-      te[1] = f;
-      te[5] = a * e;
-      te[9] = -b * e;
-
-      te[2] = -d * e;
-      te[6] = ad * f + bc;
-      te[10] = ac - bd * f;
-      break;
-    }
-
-    case Euler.XZY: {
-      const ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-      te[0] = c * e;
-      te[4] = -f;
-      te[8] = d * e;
-
-      te[1] = ac * f + bd;
-      te[5] = a * e;
-      te[9] = ad * f - bc;
-
-      te[2] = bc * f - ad;
-      te[6] = b * e;
-      te[10] = bd * f + ac;
       break;
     }
 

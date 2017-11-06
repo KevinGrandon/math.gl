@@ -34,6 +34,23 @@ const EARTH_RADIUS_METERS = 6.371e6;
 
 // Todo [rho, theta, phi] ?
 export default class SphericalCoordinates {
+  /* eslint-disable brace-style */
+  // Cartographic (bearing 0 north, pitch 0 look from above)
+  get bearing() { return 180 - degrees(this.phi); }
+  set bearing(v) { this.phi = Math.PI - radians(v); }
+  get pitch() { return degrees(this.theta); }
+  set pitch(v) { this.theta = radians(v); }
+  // get pitch() { return 90 - degrees(this.phi); }
+  // set pitch(v) { this.phi = radians(v) + Math.PI / 2; }
+  // get altitude() { return this.radius - 1; } // relative altitude
+
+  // lnglatZ coordinates
+  get longitude() { return degrees(this.phi); }
+  get latitude() { return degrees(this.theta); }
+  get lng() { return degrees(this.phi); }
+  get lat() { return degrees(this.theta); }
+  get z() { return (this.radius - 1) * this.radiusScale; }
+  /* eslint-enable brace-style */
 
   /**
    * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
@@ -88,24 +105,6 @@ export default class SphericalCoordinates {
       this.theta === other.theta &&
       this.phi === other.phi;
   }
-
-  /* eslint-disable brace-style */
-  // Cartographic (bearing 0 north, pitch 0 look from above)
-  get bearing() { return 180 - degrees(this.phi); }
-  set bearing(v) { this.phi = Math.PI - radians(v); }
-  get pitch() { return degrees(this.theta); }
-  set pitch(v) { this.theta = radians(v); }
-  // get pitch() { return 90 - degrees(this.phi); }
-  // set pitch(v) { this.phi = radians(v) + Math.PI / 2; }
-  // get altitude() { return this.radius - 1; } // relative altitude
-
-  // lnglatZ coordinates
-  get longitude() { return degrees(this.phi); }
-  get latitude() { return degrees(this.theta); }
-  get lng() { return degrees(this.phi); }
-  get lat() { return degrees(this.theta); }
-  get z() { return (this.radius - 1) * this.radiusScale; }
-  /* eslint-enable brace-style */
 
   set(radius, phi, theta) {
     this.radius = radius;

@@ -18,19 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import MathArray from './math-array';
+import Vector from './vector';
 import {checkNumber} from './common';
 
 // gl-matrix is too big. Cherry-pick individual imports from stack.gl version
 /* eslint-disable camelcase */
-import vec3_set from 'gl-vec3/set';
 import vec3_angle from 'gl-vec3/angle';
-import vec3_add from 'gl-vec3/add';
-import vec3_subtract from 'gl-vec3/subtract';
-import vec3_multiply from 'gl-vec3/multiply';
-import vec3_divide from 'gl-vec3/divide';
-import vec3_scale from 'gl-vec3/scale';
-import vec3_scaleAndAdd from 'gl-vec3/scaleAndAdd';
 import vec3_cross from 'gl-vec3/cross';
 import vec3_rotateX from 'gl-vec3/rotateX';
 import vec3_rotateY from 'gl-vec3/rotateY';
@@ -43,22 +36,7 @@ export function validateVector3(v) {
     Number.isFinite(v[0]) && Number.isFinite(v[1]) && Number.isFinite(v[2]);
 }
 
-export default class Vector3 extends MathArray {
-  // Creates a new vec3, either empty, or from an array or from values
-  constructor(x = 0, y = 0, z = 0) {
-    super();
-    if (Array.isArray(x) && arguments.length === 1) {
-      this.copy(x);
-    } else {
-      this.set(x, y, z);
-    }
-  }
-
-  set(x, y, z) {
-    vec3_set(this, x, y, z);
-    return this.check();
-  }
-
+export default class Vector3 extends Vector {
   // Getters/setters
   /* eslint-disable no-multi-spaces, brace-style, no-return-assign */
   get ELEMENTS() { return 3; }
@@ -70,41 +48,36 @@ export default class Vector3 extends MathArray {
   set z(value) { return this[2] = checkNumber(value); }
   /* eslint-enable no-multi-spaces, brace-style, no-return-assign */
 
+  // Creates a new vec3, either empty, or from an array or from values
+  constructor(x = 0, y = 0, z = 0) {
+    super();
+    if (Array.isArray(x) && arguments.length === 1) {
+      this.copy(x);
+    } else {
+      this.set(x, y, z);
+    }
+  }
+
+  set(x, y, z) {
+    this[0] = x;
+    this[1] = y;
+    this[2] = z;
+    return this.check();
+  }
+
   angle(vector) {
     return vec3_angle(this, vector);
   }
 
   // MODIFIERS
 
-  add(...vectors) {
-    for (const vector of vectors) {
-      vec3_add(this, this, vector);
-    }
-    return this.check();
-  }
-
-  subtract(...vectors) {
-    for (const vector of vectors) {
-      vec3_subtract(this, this, vector);
-    }
-    return this.check();
-  }
-
-  multiply(...vectors) {
-    for (const vector of vectors) {
-      vec3_multiply(this, this, vector);
-    }
-    return this.check();
-  }
-
-  scale(scale) {
-    if (Number.isFinite(scale)) {
-      vec3_scale(this, this, scale);
-    } else {
-      vec3_multiply(this, this, scale);
-    }
-    return this.check();
-  }
+  // add(...vectors)
+  // subtract(...vectors)
+  // multiply(...vectors)
+  // divide(...vectors)
+  // scale(numberOrVector)
+  // scaleAndAdd(number, vector)
+  // lerp
 
   cross(vector) {
     vec3_cross(this, this, vector);
@@ -123,24 +96,6 @@ export default class Vector3 extends MathArray {
 
   rotateZ({radians, origin = ORIGIN}) {
     vec3_rotateZ(this, this, origin, radians);
-    return this.check();
-  }
-
-  operation(operation, ...args) {
-    operation(this, this, ...args);
-    return this.check();
-  }
-
-  // TBD - do we really need these?
-  divide(...vectors) {
-    for (const vector of vectors) {
-      vec3_divide(this, this, vector);
-    }
-    return this.check();
-  }
-
-  scaleAndAdd(vector, scale) {
-    vec3_scaleAndAdd(this, this, vector, scale);
     return this.check();
   }
 }

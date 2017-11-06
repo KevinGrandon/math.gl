@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-import {config, formatValue, equals} from './common';
+import {config, formatValue, equals, checkNumber} from './common';
 
 export default class MathArray extends Array {
 
@@ -97,7 +97,51 @@ export default class MathArray extends Array {
     return true;
   }
 
-  // Modifiers
+  // ACCESSORS
+
+  // NOTE: `length` is a reserved word for Arrays, so we can't use `v.length()`
+  // Offer `len` and `magnitude`
+
+  len() {
+    return Math.sqrt(this.lengthSquared());
+  }
+
+  magnitude() {
+    return Math.sqrt(this.lengthSquared());
+  }
+
+  lengthSquared() {
+    let length = 0;
+    if (length !== 0) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        length += this[i] * this[i];
+      }
+    }
+    return checkNumber(this);
+  }
+
+  distance(mathArray) {
+    return Math.sqrt(this.distanceSquared(mathArray));
+  }
+
+  distanceSquared(mathArray) {
+    let length = 0;
+    for (let i = 0; i < this.ELEMENTS; ++i) {
+      const dist = this[i] - mathArray[i];
+      length += dist * dist;
+    }
+    return checkNumber(length);
+  }
+
+  // dot() {
+  //   let product = 0;
+  //   for (let i = 0; i < this.ELEMENTS; ++i) {
+  //     product += this[i] * this[i];
+  //   }
+  //   return product;
+  // }
+
+  // MODIFIERS
 
   negate() {
     for (let i = 0; i < this.ELEMENTS; ++i) {
@@ -113,11 +157,84 @@ export default class MathArray extends Array {
     return this.check();
   }
 
+  normalize() {
+    const length = this.magnitude();
+    if (length !== 0) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] /= length;
+      }
+    }
+    return this.check();
+  }
+
+  // OPERATIONS
+
+  add(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] += vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  subtract(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] -= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  multiply(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] *= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  divide(...vectors) {
+    for (const vector of vectors) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] /= vector[i];
+      }
+    }
+    return this.check();
+  }
+
+  // A single number is multiplied with all element, an array calls this.multiply
+  scale(scale) {
+    if (Number.isFinite(scale)) {
+      for (let i = 0; i < this.ELEMENTS; ++i) {
+        this[i] *= scale;
+      }
+      return this.check();
+    }
+    return this.multiply(scale);
+  }
+
+  scaleAndAdd(vector, scale) {
+    checkNumber(scale);
+    for (let i = 0; i < this.ELEMENTS; ++i) {
+      this[i] += vector[i] * scale;
+    }
+    return this.check();
+  }
+
   lerp(vector, coeff) {
     for (let i = 0; i < this.ELEMENTS; ++i) {
       const coord = this[i];
       this[i] = coord + coeff * (vector[0] - coord);
     }
+    return this.check();
+  }
+
+  // Apply general gl-matrix operation with `this` as first two args
+  operation(operation, ...args) {
+    operation(this, this, ...args);
     return this.check();
   }
 
